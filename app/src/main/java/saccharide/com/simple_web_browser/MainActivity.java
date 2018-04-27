@@ -4,6 +4,7 @@ import android.os.HandlerThread;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -24,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     Button web_url;
     EditText user_url;
-    TextView server_content;
+    WebView server_content;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
         web_url = (Button) findViewById(R.id.connect_button);
         user_url = (EditText)findViewById(R.id.user_url);
-        server_content = (TextView) findViewById(R.id.content);
+        server_content = (WebView) findViewById(R.id.content);
 
 
         user_url.setOnClickListener(new View.OnClickListener() {
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         // Real proxy stuff here
 
         ProxyServer proxyServer = new ProxyServer();
+        proxyServer.execute();
 
 
 
