@@ -81,7 +81,7 @@ public class Handler extends Thread {
                     }
                     System.out.println("-----------------------------------------------");
                     for(int i = 0; i < tokens.length; i++)
-                        System.out.println(tokens[i]);
+                        System.out.println("tokens["+i+"] = "+tokens[i]);
 
                     break;
                 }
@@ -152,70 +152,69 @@ public class Handler extends Thread {
                 }
             }
             else if (request.equals("GET")) {
+
                 try {
+                    System.out.println("Making connection to : " + server_url);
 
-                    try {
-                        System.out.println("Making connection to : " + server_url);
+                    /***************************/
+                    /* Step 2                  */
+                    /* Send request to server  */
+                    /***************************/
 
-                        /***************************/
-                        /* Step 2                  */
-                        /* Send request to server  */
-                        /***************************/
+                    URL url = new URL(server_url);
+                    URLConnection conn = url.openConnection();
+                    conn.setDoInput(true);
+                    /* Step 2 complete                    */
+                    /* Finish sending request to server   */
 
-                        URL url = new URL(server_url);
-                        URLConnection conn = url.openConnection();
-                        conn.setDoInput(true);
-                        /* Step 2 complete                    */
-                        /* Finish sending request to server   */
+                    /*****************************/
+                    /* Step 3                    */
+                    /* Get response from server  */
+                    /*****************************/
 
-                        /*****************************/
-                        /* Step 3                    */
-                        /* Get response from server  */
-                        /*****************************/
+                    InputStream is = null;
 
-                        InputStream is = null;
-
-                        if (conn.getContentLength() > 0) {
-                            try {
-                                is = conn.getInputStream();
-                                rd = new BufferedReader(new InputStreamReader(is));
-                            } catch (IOException ioe) {
-                                clientSocket.close();
-                            }
-                        }
-                        else{
+                    if (conn.getContentLength() > 0) {
+                        try {
+                            is = conn.getInputStream();
+                            rd = new BufferedReader(new InputStreamReader(is));
+                        } catch (IOException ioe) {
                             clientSocket.close();
                         }
-                        /* Step 3 complete                     */
-                        /* Finish getting response from server */
+                    }
+                    else{
+                        clientSocket.close();
+                    }
+                    /* Step 3 complete                     */
+                    /* Finish getting response from server */
 
 
-                        /***************************/
-                        /* Step 4                  */
-                        /* Send response to client */
-                        /***************************/
+                    /***************************/
+                    /* Step 4                  */
+                    /* Send response to client */
+                    /***************************/
 
-                        byte by[] = new byte[ 32768 ];
-                        if (is != null) {
-                            int index = is.read(by, 0, 32768);
-                            while (index != -1) {
-                                out.write(by, 0, index);
-                                index = is.read(by, 0, 32768);
-                            }
-                            out.flush();
+                    byte by[] = new byte[ 32768 ];
+                    if (is != null) {
+                        int index = is.read(by, 0, 32768);
+                        while (index != -1) {
+                            out.write(by, 0, index);
+                            index = is.read(by, 0, 32768);
                         }
-
-                        /* Step 4 complete                     */
-                        /* Finish sending response to client   */
-
-                    } catch (Exception e) {
-                        //can redirect this to error log
-                        System.err.println("Encountered exception: " + e);
-                        //encountered error - just send nothing back, so
-                        //processing can continue
-                        out.writeBytes("");
+                        out.flush();
                     }
 
+                    /* Step 4 complete                     */
+                    /* Finish sending response to client   */
+
+                } catch (Exception e) {
+                    //can redirect this to error log
+                    System.err.println("Encountered exception: " + e);
+                    //encountered error - just send nothing back, so
+                    //processing can continue
+                    out.writeBytes("");
+                }
+                finally {
                     //close all resources
                     if (rd != null) {
                         rd.close();
@@ -229,10 +228,10 @@ public class Handler extends Thread {
                     if (clientSocket != null) {
                         clientSocket.close();
                     }
-
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
+
+
+
 
 
 
