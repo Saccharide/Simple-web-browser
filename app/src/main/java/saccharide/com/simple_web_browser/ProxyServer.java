@@ -22,12 +22,8 @@ public class ProxyServer extends AsyncTask<Void, Void, Void> {
 
             while (true){
                 Socket clientSocket = serverSocket.accept();
-                ProxyThread proxyThread = new ProxyThread();
-                Thread thread = new Thread(proxyThread);
 
-                proxyThread.clientSocket = clientSocket;
-                proxyThread.id = ++id;
-                thread.start();
+                (new Handler(clientSocket)).start();
 
             }
 

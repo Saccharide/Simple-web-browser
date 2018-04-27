@@ -3,10 +3,15 @@ package saccharide.com.simple_web_browser;
 import android.app.admin.SystemUpdateInfo;
 import android.renderscript.ScriptGroup;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.Socket;
+import java.net.URL;
+import java.util.StringTokenizer;
 
 public class ProxyThread implements Runnable{
 
@@ -21,6 +26,7 @@ public class ProxyThread implements Runnable{
             InputStream  ClientInputStream  = clientSocket.getInputStream();
             OutputStream ClientOutpurStream = clientSocket.getOutputStream();
 
+            BufferedReader in = new BufferedReader(new InputStreamReader(ClientInputStream));
             // Setting the rules for timeout
             long timeout   = 10000;
             long heartbeat = System.currentTimeMillis();
@@ -30,22 +36,53 @@ public class ProxyThread implements Runnable{
             // Getting Client request
             /***********************************************************************************/
 
+            // Storing client request
+            String inputLine;
 
+            // Setting a flag to see if we are on the first line
+            boolean first_line_reached = false;
 
+            // Initialize the url we will get from client socket
+            String server_url = "";
+            while ((inputLine = in.readLine()) != null) {
+                try {
+                    StringTokenizer tok = new StringTokenizer(inputLine);
+                    tok.nextToken();
+                } catch (Exception e) {
+                    break;
+                }
+                // Analyze the first line of the network request from socket to find the url and protocol
+                if (!first_line_reached) {
+                    String[] tokens = inputLine.split(" ");
+                    if (tokens.length > 1 )
+                        server_url = tokens[1];
+                    else {
+                        clientSocket.close();
+                        return;
+                    }
+                    System.out.println("-----------------------------------------------");
+                    for(int i = 0; i < tokens.length; i++)
+                        System.out.println(tokens[i]);
+                    System.out.println("-----------------------------------------------");
 
-
-
+                    break;
+                }
+            }
+            System.out.println("-----------------------------------------------");
+            System.out.println("Sever URL = " + server_url);
+            System.out.println("-----------------------------------------------");
+            InetAddress address = InetAddress.getByName(new URL("https://www.google.com").getHost());
+            String ip = address.getHostAddress();
             /***********************************************************************************/
 
             // Creating a socket rather than a HTTP connection
-            Socket to_server = new Socket("127.0.0.1",80);
+            Socket to_server = new Socket(ip,443);
             InputStream to_serverInputStream = to_server.getInputStream();
             OutputStream to_serverOutputStream = to_server.getOutputStream();
 
 
             /***********************************************************************************/
             byte[] received = null;
-            byte[] message  = new byte[]{};
 
             while((System.currentTimeMillis() - heartbeat ) < timeout){
 
