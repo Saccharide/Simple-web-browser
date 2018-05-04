@@ -1,3 +1,5 @@
+package saccharide.com.simple_web_browser;
+
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.support.v4.app.NotificationCompat;
